@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//END" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+     <key>CFBundleIdentifier</key>
+     <string>com.mpdaugherty.plex.plugins.tudou</string>
+     <key>PlexPluginClass</key>
+        <string>Channel</string>
+     <key>PlexPluginMode</key>
+        <string>AlwaysOn</string>
+     <key>PlexAudioCodec</key>
+     <array>
+        <string>MP3</string>
+        <string>AAC</string>
+     </array>
+     <key>PlexClientPlatforms</key>
+     <string>MacOSX,iOS,Android,LGTV</string>
+     <key>PlexFrameworkVersion</key>
+     <string>2</string>
+     <key>PlexMediaContainer</key>
+     <array>
+        <string>M4V</string>
+        <string>MOV</string>
+     </array>
+     <key>PlexVideoCodec</key>
+     <array>
+        <string>H.264</string>
+     </array>
+</dict>
+</plist>

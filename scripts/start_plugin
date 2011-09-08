@@ -1,0 +1,22 @@
+#!/bin/sh
+
+SCRIPTPATH=`dirname $0`
+
+if [ ! $1 ]
+then
+    echo 'Usage:'
+    echo '   start_plugin <plugin name>'
+    exit 1
+fi
+
+cd ${SCRIPTPATH}/../plugins
+mkdir ${1}.bundle
+cd ${1}.bundle
+mkdir Contents
+cd Contents
+
+mkdir Code
+mkdir Resources
+touch DefaultPrefs.json
+touch Info.plist
+touch VERSION
