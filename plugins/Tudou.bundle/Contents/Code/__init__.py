@@ -131,8 +131,14 @@ def GetAlbumVideos(url):
             # I'm just using the length of time as the summary for now; not ideal
             summary = summary
             )
+        Log('url = ' + url)
         movie_meta_data.add(MediaObject(
             platforms = [ ClientPlatform.MacOSX ],
+            protocols = [ Protocol.RTMP ],
+            bitrate = 1000,
+            video_codec = VideoCodec.H264,
+            audio_channels = 2,
+            container = AudioCodec.MP3,
             parts = [
                 PartObject(
                    key = url,
