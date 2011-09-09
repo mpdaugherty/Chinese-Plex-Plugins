@@ -1,5 +1,9 @@
 import urllib
 
+####################################################################################################
+ICON  = 'icon_default.png'
+####################################################################################################
+
 @handler('/video/tudou', 'Tudou')
 def Main():
   oc = ObjectContainer(
@@ -117,7 +121,7 @@ def GetAlbumVideos(url):
             duration = 0
             summary = None
 
-        videos.append(MovieObject(
+        movie_meta_data = MovieObject(
             url = url,
             title = title,
             #show = album_title,  # This only works with Episode Objects.  Maybe eventually I can figure out if I'm working with TV Shows or movies.
@@ -127,7 +131,15 @@ def GetAlbumVideos(url):
             # I'm just using the length of time as the summary for now; not ideal
             summary = summary
             )
-        )
+        movie_meta_data.add(MediaObject(
+            platforms = [ ClientPlatform.MacOSX ],
+            parts = [
+                PartObject(
+                   key = url,
+                   duration = duration
+                ),
+            ]))
+        videos.append(movie_meta_data)
     return ObjectContainer(objects = videos)
 
 def ms_from_time_string(time_str):
