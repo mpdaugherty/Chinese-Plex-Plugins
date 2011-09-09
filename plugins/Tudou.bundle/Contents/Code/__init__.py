@@ -1,3 +1,5 @@
+import urllib
+
 @handler('/video/tudou', 'Tudou')
 def Main():
   oc = ObjectContainer(
@@ -14,7 +16,13 @@ def Main():
               title = 'TV Shows'),
           DirectoryObject(
               key = Callback(GetAlbums, albumtop='c30t-1a7y-1h-1s0p1'),
-              title = 'American TV Shows')
+              title = 'American TV Shows'),
+          DirectoryObject(
+              key = Callback(GetAlbumVideos, url='http://www.tudou.com/playlist/id/10737591'),
+              title = 'P90X'),
+          DirectoryObject(
+              key = Callback(GetAlbumVideos, url='http://www.tudou.com/playlist/id/2597000'),
+              title = 'Intro Yoga (28 Classes)'),
           ]
       )
   return oc
@@ -75,20 +83,49 @@ def GetAlbumVideos(url):
     # Example URL: http://www.tudou.com/playlist/album/id65725.html
 
     videos = []
-    page = HTML.ElementFromURL(url=url, encoding='gbk')
+    try:
+        page = HTML.ElementFromURL(url=url, encoding='gbk')
+    except:
+        return ObjectContainer(objects = [MovieObject(url='x',title='Downloading page broke',summary=url)])
 
-    album_title = page.cssselect('h2 a.album-title')[0].text
+    #album_title = page.cssselect('h2 a.album-title')[0].text
     video_divs = page.cssselect('div.pack_video_card')
     for div in video_divs:
+        try:
+            url = div.cssselect('.caption a')[0].attrib.get('href')
+            url = GetPlayableVideoUrl(url)
+        except:
+            # With no URL, we can't create a video link
+            continue
+
+        try:
+            title = div.cssselect('.caption a')[0].attrib.get('title')
+            if url is None:
+                title = title + ' (No URL Found; Unplayable)'
+        except:
+            title = 'NO TITLE FOUND'
+
+        try:
+            thumb = div.cssselect('div.pic img')[0].attrib.get('src')
+        except:
+            thumb = None
+
+        try:
+            summary = div.cssselect('span.vinf')[0].text
+            duration = ms_from_time_string(summary)
+        except:
+            duration = 0
+            summary = None
+
         videos.append(MovieObject(
-            url = div.cssselect('h6.caption a')[0].attrib.get('href'),
-            title = div.cssselect('h6.caption a')[0].attrib.get('title'),
+            url = url,
+            title = title,
             #show = album_title,  # This only works with Episode Objects.  Maybe eventually I can figure out if I'm working with TV Shows or movies.
-            thumb = div.cssselect('div.pic img')[0].attrib.get('src'),
-            duration = ms_from_time_string(div.cssselect('span.vinf')[0].text),
+            thumb = thumb,
+            duration = duration,
 
             # I'm just using the length of time as the summary for now; not ideal
-            summary = div.cssselect('span.vinf')[0].text
+            summary = summary
             )
         )
     return ObjectContainer(objects = videos)
@@ -115,3 +152,19 @@ def ms_from_time_string(time_str):
         pass
 
     return 1000 * seconds
+
+def GetPlayableVideoUrl(tudou_url):
+    page = HTML.ElementFromURL(url='http://www.flvcd.com/parse.php?kw='+urllib.quote(tudou_url), encoding='gbk')
+    try:
+        real_url = page.cssselect('a.link')[0].attrib.get('href')
+    except:
+        return None
+
+    try:
+        url_parts = real_url.split('/')
+        host = str.join('/', url_parts[:3])+'/'
+        clip = str.join('/', url_parts[3:])
+        return RTMPVideoURL(host, clip=clip)
+    except:
+        return None
+
